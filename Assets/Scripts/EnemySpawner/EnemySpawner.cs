@@ -16,11 +16,13 @@ public class EnemySpawner : MonoBehaviour
     private void Start()
     {
         if (_spawnLocations.Length > 0)
-            StartCoroutine(SpawnCoroutine(_respawnTime));
+            StartCoroutine(StartSpawningEnemies(_respawnTime));
     }
 
-    private IEnumerator SpawnCoroutine(float respawnTime)
+    private IEnumerator StartSpawningEnemies(float respawnTime)
     {
+        var delay = new WaitForSeconds(respawnTime);
+
         while (true)
         {
             if (_enemies.Count < _maxNumberOfEnemies || _enemies.RemoveAll(item => !item) > 0)
@@ -32,7 +34,7 @@ public class EnemySpawner : MonoBehaviour
                 _enemies.Add(enemy.gameObject);
             }
 
-            yield return new WaitForSeconds(respawnTime);
+            yield return delay;
         }
     }
 }

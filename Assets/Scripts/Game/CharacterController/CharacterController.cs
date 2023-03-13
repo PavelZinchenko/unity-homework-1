@@ -27,6 +27,42 @@ public class CharacterController : MonoBehaviour
     private GroundDetector _groundDetector;
     private ICharacterAnimation _animation;
 
+    private void Awake()
+    {
+        _rigidbody2D = GetComponent<Rigidbody2D>();
+        _animation = GetComponent<ICharacterAnimation>();
+
+        // some characters don't need it
+        if (!TryGetComponent(out _groundDetector))
+            _groundDetector = null;
+    }
+
+    private void FixedUpdate()
+    {
+        var velocity = _rigidbody2D.velocity;
+        var targetVelocity = new Vector2(_movementDirection * _movementSpeed, velocity.y);
+        var grounded = _groundDetector ? _groundDetector.IsGrounded : true;
+
+        if (_jump && grounded && Time.fixedTime - _lastJumpTime >= _jumpCooldown)
+        {
+            velocity.y = -_jumpForce;
+            _lastJumpTime = Time.fixedTime;
+            _jumpEvent.Invoke();
+        }
+
+        if (_bounce)
+        {
+            velocity.y = Mathf.Min(velocity.y, -_bounceForce);
+            _lastJumpTime = Time.fixedTime;
+            _bounce = false;
+        }
+
+        if (_airControl || grounded)
+            _rigidbody2D.AddForce((targetVelocity - velocity) * Time.fixedDeltaTime * _acceleration);
+
+        _animation.SetVelocity(velocity.x / _movementSpeed, velocity.y, grounded);
+    }
+
     public void Move(float speed)
     {
         _movementDirection = speed;
@@ -78,41 +114,5 @@ public class CharacterController : MonoBehaviour
         _animation.Hit();
         _hitEvent.Invoke();
         return true;
-    }
-
-    private void Awake()
-    {
-        _rigidbody2D = GetComponent<Rigidbody2D>();
-        _animation = GetComponent<ICharacterAnimation>();
-
-        // some characters don't need it
-        if (!TryGetComponent(out _groundDetector))
-            _groundDetector = null;
-    }
-
-    private void FixedUpdate()
-    {
-        var velocity = _rigidbody2D.velocity;
-        var targetVelocity = new Vector2(_movementDirection * _movementSpeed, velocity.y);
-        var grounded = _groundDetector ? _groundDetector.IsGrounded : true;
-
-        if (_jump && grounded && Time.fixedTime - _lastJumpTime >= _jumpCooldown)
-        {
-            velocity.y = -_jumpForce;
-            _lastJumpTime = Time.fixedTime;
-            _jumpEvent.Invoke();
-        }
-
-        if (_bounce)
-        {
-            velocity.y = Mathf.Min(velocity.y, -_bounceForce);
-            _lastJumpTime = Time.fixedTime;
-            _bounce = false;
-        }
-
-        if (_airControl || grounded)
-            _rigidbody2D.AddForce((targetVelocity - velocity) * Time.fixedDeltaTime * _acceleration);
-
-        _animation.SetVelocity(velocity.x / _movementSpeed, velocity.y, grounded);
     }
 }

@@ -29,15 +29,17 @@ public class CoinSpawner : MonoBehaviour
         for (int i = 0; i < _maxNumberOfCoins; ++i)
             SpawnCoin();
 
-        StartCoroutine(SpawnCoinCoroutine(_respawnTime));
+        StartCoroutine(StartSpawningCoins(_respawnTime));
     }
 
-    private IEnumerator SpawnCoinCoroutine(float respawnTime)
+    private IEnumerator StartSpawningCoins(float respawnTime)
     {
+        var delay = new WaitForSeconds(respawnTime);
+
         while (true)
         {
             SpawnCoin();
-            yield return new WaitForSeconds(respawnTime);
+            yield return delay;
         }
     }
 

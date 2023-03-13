@@ -13,16 +13,8 @@ public class Alarm : MonoBehaviour
     [SerializeField] private UnityEvent _alarmStoppedEvent = new();
 
     private bool _isActivated;
-    private bool _isRunning;
+    private bool _isCoroutineRunning;
     private AudioSource _audioSource;
-
-    public void Activate(bool active)
-    {
-        _isActivated = active;
-
-        if (_isActivated && !_isRunning)
-            StartCoroutine(AlarmCoroutine());
-    }
 
     private void OnValidate()
     {
@@ -39,9 +31,19 @@ public class Alarm : MonoBehaviour
         _audioSource = GetComponent<AudioSource>();
     }
 
-    private IEnumerator AlarmCoroutine()
+    public void Activate(bool active)
     {
-        _isRunning = true;
+        _isActivated = active;
+
+        if (_isActivated && !_isCoroutineRunning)
+            StartCoroutine(StartAlarm());
+    }
+
+    private IEnumerator StartAlarm()
+    {
+        if (_isCoroutineRunning) yield break;
+
+        _isCoroutineRunning = true;
         _audioSource.Play();
         _alarmStartedEvent.Invoke();
 
@@ -50,19 +52,13 @@ public class Alarm : MonoBehaviour
         do
         {
             var delta = Time.deltaTime * _volumeChangePerSec;
-
-            if (_isActivated && volume < _volumeMax)
-                volume = Mathf.MoveTowards(volume, _volumeMax, delta);
-            else if (!_isActivated && volume > _volumeMin)
-                volume = Mathf.MoveTowards(volume, _volumeMin, delta);
-
+            volume = Mathf.MoveTowards(volume, _isActivated ? _volumeMax : _volumeMin, delta);
             _audioSource.volume = volume;
-
             yield return null;
         }
         while (volume > _volumeMin);
 
-        _isRunning = false;
+        _isCoroutineRunning = false;
         _audioSource.Stop();
         _alarmStoppedEvent.Invoke();
     }

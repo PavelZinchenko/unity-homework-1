@@ -13,6 +13,30 @@ public class EnemyController : MonoBehaviour
     private const float MinObstacleNormalX = 0.75f;
     private const float Speed = 1.0f;
 
+    private void Awake()
+    {
+        _characterController = GetComponent<CharacterController>();
+        _moveDirection = transform.localScale.x > 0 ? Speed : -Speed;
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        ProcessObstacles(collision);
+    }
+
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        ProcessObstacles(collision);
+    }
+
+    private void Update()
+    {
+        _characterController.Move(_moveDirection);
+        
+        if (transform.localPosition.y < _destroyWhenYBelow) 
+            Destroy(gameObject);
+    }
+
     public void SetTarget(Transform target)
     {
         _moveDirection = target.localPosition.x > transform.localPosition.x ? Speed : -Speed;
@@ -30,22 +54,6 @@ public class EnemyController : MonoBehaviour
     {
     }
 
-    private void Awake()
-    {
-        _characterController = GetComponent<CharacterController>();
-        _moveDirection = transform.localScale.x > 0 ? Speed : -Speed;
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        ProcessObstacles(collision);
-    }
-
-    private void OnCollisionStay2D(Collision2D collision)
-    {
-        ProcessObstacles(collision);
-    }
-
     private void ProcessObstacles(Collision2D collision)
     {
         for (int i = 0; i < collision.contactCount; ++i)
@@ -56,13 +64,5 @@ public class EnemyController : MonoBehaviour
             if (x > MinObstacleNormalX) _moveDirection = Speed;
             if (x < -MinObstacleNormalX) _moveDirection = -Speed;
         }
-    }
-
-    private void Update()
-    {
-        _characterController.Move(_moveDirection);
-        
-        if (transform.localPosition.y < _destroyWhenYBelow) 
-            Destroy(gameObject);
     }
 }
