@@ -4,7 +4,12 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
-    [Range(0.1f, 3f)][SerializeField] private float _invincibilityTime = 0.5f;
+    private CharacterController _characterController;
+
+    private void Awake()
+    {
+        _characterController = GetComponent<CharacterController>();
+    }
 
     public void OnMove(InputAction.CallbackContext context)
     {
@@ -27,11 +32,4 @@ public class PlayerController : MonoBehaviour
     {
         _characterController.Bounce();
     }
-
-    private void Awake()
-    {
-        _characterController = GetComponent<CharacterController>();
-    }
-
-    private CharacterController _characterController;
 }

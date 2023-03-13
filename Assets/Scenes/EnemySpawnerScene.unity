@@ -3852,13 +3852,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4026ee808199ecd438a8a48c04828807, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _enemyPrefab: {fileID: 9047170409147209755, guid: bf6983e8bd6d8e84ab1e8f10b6d2f591, type: 3}
+  _enemyPrefab: {fileID: 9047170409147209753, guid: bf6983e8bd6d8e84ab1e8f10b6d2f591, type: 3}
   _spawnLocations:
   - {fileID: 110203513}
   - {fileID: 657594692}
   - {fileID: 1266203751}
   - {fileID: 176350440}
   _respawnTime: 2
+  _maxNumberOfEnemies: 100
+  _target: {fileID: 4269524551561261060, guid: 6e93bd625fcf98d4a8ff528b0ff7f193, type: 3}
 --- !u!4 &1709743426
 Transform:
   m_ObjectHideFlags: 0

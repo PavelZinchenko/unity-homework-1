@@ -1,13 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 public class CoinSpawner : MonoBehaviour
 {
-    [SerializeField] private GameObject _coinPrefab;
+    [SerializeField] private Coin _coinPrefab;
     [SerializeField] private Transform[] _spawnPoints = {};
     [Range(1, 10)][SerializeField] private float _respawnTime = 5f;
     [Range(1, 100)][SerializeField] private int _maxNumberOfCoins = 10;
+
+    private readonly List<int> _freeSpawnPoints = new();
+    private readonly List<GameObject> _coins = new();
+    private readonly Dictionary<GameObject, int> _usedSpawnPoints = new();
+    private readonly System.Random _random = new();
 
     private void OnValidate()
     {
@@ -17,19 +23,22 @@ public class CoinSpawner : MonoBehaviour
 
     private void Start()
     {
-        _freeSpawnPoints.AddRange(Enumerable.Range(0, _spawnPoints.Length));
+        if (_maxNumberOfCoins == 0) return;
 
+        _freeSpawnPoints.AddRange(Enumerable.Range(0, _spawnPoints.Length));
         for (int i = 0; i < _maxNumberOfCoins; ++i)
             SpawnCoin();
+
+        StartCoroutine(SpawnCoinCoroutine(_respawnTime));
     }
 
-    private void Update()
+    private IEnumerator SpawnCoinCoroutine(float respawnTime)
     {
-        _cooldown -= Time.deltaTime;
-        if (_cooldown > 0) return;
-
-        SpawnCoin();
-        _cooldown = _respawnTime;
+        while (true)
+        {
+            SpawnCoin();
+            yield return new WaitForSeconds(respawnTime);
+        }
     }
 
     private void SpawnCoin()
@@ -42,7 +51,7 @@ public class CoinSpawner : MonoBehaviour
         _freeSpawnPoints.RemoveAt(index);
         var spawnPoint = _spawnPoints[id];
 
-        var coin = GameObject.Instantiate(_coinPrefab, spawnPoint.position, Quaternion.identity);
+        var coin = Instantiate(_coinPrefab, spawnPoint.position, Quaternion.identity).gameObject;
         _coins.Add(coin);
         _usedSpawnPoints.Add(coin, id);
     }
@@ -65,10 +74,4 @@ public class CoinSpawner : MonoBehaviour
 
         return found;
     }
-
-    private float _cooldown;
-    private readonly List<int> _freeSpawnPoints = new();
-    private readonly List<GameObject> _coins = new();
-    private readonly Dictionary<GameObject, int> _usedSpawnPoints = new();
-    private readonly System.Random _random = new();
 }

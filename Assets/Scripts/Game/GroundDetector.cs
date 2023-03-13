@@ -5,6 +5,11 @@ public class GroundDetector : MonoBehaviour
 {
     [SerializeField] private LayerMask _groundLayerMask;
 
+    private readonly List<ContactPoint2D> _contactPoints = new();
+    private readonly HashSet<GameObject> _ground = new();
+
+    private const float MinGroundNormalY = 0.9f;
+
     public bool IsGrounded => _ground.Count > 0;
 
     private void OnCollisionStay2D(Collision2D collision)
@@ -21,6 +26,11 @@ public class GroundDetector : MonoBehaviour
             _ground.Add(collision.gameObject);
     }
 
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        _ground.Remove(collision.gameObject);
+    }
+
     private bool IsGround(Collision2D collision)
     {
         if (!_groundLayerMask.Contains(collision.gameObject.layer))
@@ -34,14 +44,4 @@ public class GroundDetector : MonoBehaviour
 
         return false;
     }
-
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        _ground.Remove(collision.gameObject);
-    }
-
-    private readonly List<ContactPoint2D> _contactPoints = new();
-    private readonly HashSet<GameObject> _ground = new();
-
-    private const float MinGroundNormalY = 0.9f;
 }

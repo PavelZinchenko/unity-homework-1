@@ -5151,6 +5151,7 @@ GameObject:
   - component: {fileID: 1676845813}
   - component: {fileID: 1676845812}
   - component: {fileID: 1676845811}
+  - component: {fileID: 1676845815}
   m_Layer: 7
   m_Name: Alarm
   m_TagString: Untagged
@@ -5266,8 +5267,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 449372e7320b5aa408d8dd41e9696534, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _timeMultiplier: 0.3
-  _alarmStartEvent:
+  _volumeChangePerSec: 0.1
+  _volumeMax: 1
+  _volumeMin: 0
+  _alarmStartedEvent:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1764818767}
@@ -5282,7 +5285,7 @@ MonoBehaviour:
           m_StringArgument: Alarm
           m_BoolArgument: 0
         m_CallState: 2
-  _alarmStopEvent:
+  _alarmStoppedEvent:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1764818767}
@@ -5338,6 +5341,48 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1676845815
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1676845810}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: adfd33e5aaeda2942a58ac0671a16d96, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _activatedEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1676845812}
+        m_TargetAssemblyTypeName: Alarm, Assembly-CSharp
+        m_MethodName: Activate
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+  _deactivatedEvent:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1676845812}
+        m_TargetAssemblyTypeName: Alarm, Assembly-CSharp
+        m_MethodName: Activate
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1764818764
 GameObject:
   m_ObjectHideFlags: 0

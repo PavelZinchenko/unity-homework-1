@@ -4,9 +4,19 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterController))]
 public class EnemyController : MonoBehaviour
 {
-    [SerializeField] private string _playerTag = "Player";
     [SerializeField] private float _destroyWhenYBelow = -10;
     [Range(0,10)][SerializeField] private int _lives = 2;
+
+    private float _moveDirection;
+    private CharacterController _characterController;
+
+    private const float MinObstacleNormalX = 0.75f;
+    private const float Speed = 1.0f;
+
+    public void SetTarget(Transform target)
+    {
+        _moveDirection = target.localPosition.x > transform.localPosition.x ? Speed : -Speed;
+    }
 
     public void OnGetHit()
     {
@@ -23,11 +33,7 @@ public class EnemyController : MonoBehaviour
     private void Awake()
     {
         _characterController = GetComponent<CharacterController>();
-
-        var player = GameObject.FindGameObjectWithTag(_playerTag);
-
-        if (player)
-            _direction = player.transform.localPosition.x > transform.localPosition.x ? 1f : -1f;
+        _moveDirection = transform.localScale.x > 0 ? Speed : -Speed;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -47,22 +53,16 @@ public class EnemyController : MonoBehaviour
             var contactPoint = collision.GetContact(i);
             var x = contactPoint.normal.x;
 
-            if (x > MinObstacleNormalX) _direction = 1;
-            if (x < -MinObstacleNormalX) _direction = -1;
+            if (x > MinObstacleNormalX) _moveDirection = Speed;
+            if (x < -MinObstacleNormalX) _moveDirection = -Speed;
         }
     }
 
     private void Update()
     {
-        _characterController.Move(_direction);
+        _characterController.Move(_moveDirection);
         
         if (transform.localPosition.y < _destroyWhenYBelow) 
             Destroy(gameObject);
     }
-
-    private float _direction;
-    private float _lastHitTime;
-    private CharacterController _characterController;
-
-    private const float MinObstacleNormalX = 0.75f;
 }

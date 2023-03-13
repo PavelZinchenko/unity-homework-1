@@ -11,6 +11,8 @@ public class EnemyCollider : MonoBehaviour
     [SerializeField] private UnityEvent _successEvent = new();
     [SerializeField] private UnityEvent _failureEvent = new();
 
+    private readonly List<ContactPoint2D> _contactPoints = new();
+
     private void OnCollisionStay2D(Collision2D collision)
     {
         ProcessCollision(collision);
@@ -36,6 +38,4 @@ public class EnemyCollider : MonoBehaviour
             else
                 _failureEvent.Invoke();
     }
-
-    private readonly List<ContactPoint2D> _contactPoints = new();
 }

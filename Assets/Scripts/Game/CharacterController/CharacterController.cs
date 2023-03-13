@@ -18,6 +18,15 @@ public class CharacterController : MonoBehaviour
     [SerializeField] private UnityEvent _jumpEvent = new();
     [SerializeField] private UnityEvent _hitEvent = new();
 
+    private bool _jump;
+    private bool _bounce;
+    private float _lastHitTime;
+    private float _movementDirection;
+    private float _lastJumpTime;
+    private Rigidbody2D _rigidbody2D;
+    private GroundDetector _groundDetector;
+    private ICharacterAnimation _animation;
+
     public void Move(float speed)
     {
         _movementDirection = speed;
@@ -41,21 +50,22 @@ public class CharacterController : MonoBehaviour
         StartCoroutine(WaitThenDestroy(_corpseDisappearTime));
     }
 
-    private IEnumerator WaitThenDestroy(float time)
+    private IEnumerator WaitThenDestroy(float totalSeconds)
     {
         if (TryGetComponent<SpriteRenderer>(out var renderer))
         {
-            const int iterationCount = 32;
             var color = renderer.color;
-            for (int i = 0; i < iterationCount; ++i)
+            float timeLeft = totalSeconds;
+            while (timeLeft > 0)
             {
-                yield return new WaitForSeconds(time / iterationCount);
-                renderer.color = new Color(color.r, color.g, color.b, color.a * (iterationCount - i) / iterationCount);
+                renderer.color = new Color(color.r, color.g, color.b, color.a * timeLeft / totalSeconds);
+                timeLeft -= Time.deltaTime;
+                yield return null;
             }
         }
         else
         {
-            yield return new WaitForSeconds(time);
+            yield return new WaitForSeconds(totalSeconds);
         }
 
         Destroy(gameObject);
@@ -73,8 +83,11 @@ public class CharacterController : MonoBehaviour
     private void Awake()
     {
         _rigidbody2D = GetComponent<Rigidbody2D>();
-        _groundDetector = GetComponent<GroundDetector>();
         _animation = GetComponent<ICharacterAnimation>();
+
+        // some characters don't need it
+        if (!TryGetComponent(out _groundDetector))
+            _groundDetector = null;
     }
 
     private void FixedUpdate()
@@ -102,15 +115,4 @@ public class CharacterController : MonoBehaviour
 
         _animation.SetVelocity(velocity.x / _movementSpeed, velocity.y, grounded);
     }
-
-    private bool _jump;
-    private bool _bounce;
-    private float _lastHitTime;
-    private float _movementDirection;
-
-    private float _lastJumpTime;
-
-    private Rigidbody2D _rigidbody2D;
-    private GroundDetector _groundDetector;
-    private ICharacterAnimation _animation;
 }

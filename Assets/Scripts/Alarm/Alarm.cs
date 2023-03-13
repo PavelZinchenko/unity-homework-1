@@ -1,21 +1,37 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.Events;
 
 [RequireComponent(typeof(AudioSource))]
 public class Alarm : MonoBehaviour
 {
-    [Range(0.01f,10f)][SerializeField] private float _timeMultiplier = 0.1f;
-    [SerializeField] private UnityEvent _alarmStartEvent = new();
-    [SerializeField] private UnityEvent _alarmStopEvent = new();
+    [Range(0.01f, 10f)][SerializeField] private float _volumeChangePerSec = 0.1f;
+    [Range(0f, 1f)][SerializeField] private float _volumeMax = 1f;
+    [Range(0f, 1f)][SerializeField] private float _volumeMin = 0f;
 
-    private void OnTriggerEnter2D(Collider2D collider)
+    [SerializeField] private UnityEvent _alarmStartedEvent = new();
+    [SerializeField] private UnityEvent _alarmStoppedEvent = new();
+
+    private bool _isActivated;
+    private bool _isRunning;
+    private AudioSource _audioSource;
+
+    public void Activate(bool active)
     {
-        _isActive = true;
+        _isActivated = active;
+
+        if (_isActivated && !_isRunning)
+            StartCoroutine(AlarmCoroutine());
     }
 
-    private void OnTriggerExit2D(Collider2D collider)
+    private void OnValidate()
     {
-        _isActive = false;
+        if (_volumeMin > _volumeMax)
+        {
+            var temp = _volumeMin;
+            _volumeMin = _volumeMax;
+            _volumeMax = temp;
+        }
     }
 
     private void Awake()
@@ -23,40 +39,31 @@ public class Alarm : MonoBehaviour
         _audioSource = GetComponent<AudioSource>();
     }
 
-    private void Update()
+    private IEnumerator AlarmCoroutine()
     {
-        if (_isActive)
-            Volume = Mathf.MoveTowards(Volume, 1.0f, Time.deltaTime * _timeMultiplier);
-        else
-            Volume = Mathf.MoveTowards(Volume, 0.0f, Time.deltaTime * _timeMultiplier);
-    }
+        _isRunning = true;
+        _audioSource.Play();
+        _alarmStartedEvent.Invoke();
 
-    private float Volume
-    {
-        get { return _volume; }
-        set
+        float volume = _volumeMin;
+
+        do
         {
-            _volume = Mathf.Clamp(value, 0f, 1f);
-            
-            if (_volume > 0)
-            {
-                if (!_audioSource.isPlaying)
-                {
-                    _audioSource.Play();
-                    _alarmStartEvent.Invoke();
-                }
+            var delta = Time.deltaTime * _volumeChangePerSec;
 
-                _audioSource.volume = _volume;
-            }
-            else if (_audioSource.isPlaying)
-            {
-                _audioSource.Stop();
-                _alarmStopEvent.Invoke();
-            }
+            if (_isActivated && volume < _volumeMax)
+                volume = Mathf.MoveTowards(volume, _volumeMax, delta);
+            else if (!_isActivated && volume > _volumeMin)
+                volume = Mathf.MoveTowards(volume, _volumeMin, delta);
+
+            _audioSource.volume = volume;
+
+            yield return null;
         }
-    }
+        while (volume > _volumeMin);
 
-    private float _volume;
-    private bool _isActive;
-    private AudioSource _audioSource;
+        _isRunning = false;
+        _audioSource.Stop();
+        _alarmStoppedEvent.Invoke();
+    }
 }

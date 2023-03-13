@@ -3486,7 +3486,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48979deecba9ccc41b3dc6a7e5f7c140, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _coinPrefab: {fileID: 6569840007983849279, guid: bda72b33fce840249bfea83ab94ebde6, type: 3}
+  _coinPrefab: {fileID: 8198703853639458118, guid: bda72b33fce840249bfea83ab94ebde6, type: 3}
   _spawnPoints:
   - {fileID: 1168103611}
   - {fileID: 287314452}
@@ -3586,12 +3586,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4026ee808199ecd438a8a48c04828807, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _enemyPrefab: {fileID: 9047170409147209755, guid: bf6983e8bd6d8e84ab1e8f10b6d2f591, type: 3}
+  _enemyPrefab: {fileID: 9047170409147209753, guid: bf6983e8bd6d8e84ab1e8f10b6d2f591, type: 3}
   _spawnLocations:
   - {fileID: 1256337419}
   - {fileID: 1855701517}
   _respawnTime: 2
-  _maxNumberOfEnemies: 3
+  _maxNumberOfEnemies: 5
+  _target: {fileID: 2079100276}
 --- !u!4 &992195820
 Transform:
   m_ObjectHideFlags: 0
